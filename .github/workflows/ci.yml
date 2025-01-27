@@ -29,9 +29,26 @@ jobs:
     
     - name: Run tests
       run: pnpm test -- --no-watch --browsers=ChromeHeadless
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build and test Nginx configuration
+        run: |
+          docker build -t app-nginx .
+          docker run -d -p 3000:3000 --name test-nginx app-nginx
+          sleep 10
+          curl -f http://localhost:3000 || exit 1
+          docker stop test-nginx
   
   deploy:
-    needs: build
+    needs: docker
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
