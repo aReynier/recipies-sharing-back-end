@@ -57,10 +57,10 @@ jobs:
     - name: Deploy to VPS
       uses: appleboy/ssh-action@master
       with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_PORT: ${{ secrets.VPS_PORT }}
-          VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.VPS_HOST }}
+          port: ${{ secrets.VPS_PORT }}
+          username: ${{ secrets.VPS_USERNAME }}
           script: |
             # Create temp directory for build
             TEMP_DIR=$(mktemp -d)
