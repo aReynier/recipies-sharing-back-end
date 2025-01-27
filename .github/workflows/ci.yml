@@ -33,24 +33,49 @@ jobs:
   docker:
     needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # Only run on main branch
     steps:
       - uses: actions/checkout@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       
-      - name: Build and test Nginx configuration
+      - name: Build and test Docker configuration
         run: |
-          docker build -t app-nginx .
-          docker run -d -p 3000:3000 --name test-nginx app-nginx
+          docker build -t app-backend .
+          docker run -d -p 3000:3000 --name test-container app-backend
           sleep 10
           curl -f http://localhost:3000 || exit 1
-          docker stop test-nginx
+          docker stop test-container
   
   deploy:
     needs: docker
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # Only deploy on main branch
     steps:
     - uses: actions/checkout@v2
-    - name: Deploy step
-      run: echo "Deploying application here..." 
+
+    - name: Deploy to VPS
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        VPS_HOST: ${{ secrets.VPS_HOST }}
+        VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+      run: |
+        # Install SSH key
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+
+        # Copy files to VPS
+        scp Dockerfile $VPS_USERNAME@$VPS_HOST:~/app/
+        scp package.json $VPS_USERNAME@$VPS_HOST:~/app/
+        scp pnpm-lock.yaml $VPS_USERNAME@$VPS_HOST:~/app/
+        scp -r src/ $VPS_USERNAME@$VPS_HOST:~/app/
+
+        # Execute deployment commands on VPS
+        ssh $VPS_USERNAME@$VPS_HOST "cd ~/app && \
+          docker stop app-backend || true && \
+          docker rm app-backend || true && \
+          docker build -t app-backend . && \
+          docker run -d --name app-backend -p 3000:3000 app-backend" 
