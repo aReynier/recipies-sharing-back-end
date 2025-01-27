@@ -59,6 +59,7 @@ jobs:
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         VPS_HOST: ${{ secrets.VPS_HOST }}
+        VPS_PORT: ${{ secrets.VPS_PORT }}
         VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
       run: |
         # Install SSH key
