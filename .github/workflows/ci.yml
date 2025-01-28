@@ -1,0 +1,16 @@
+name: Préparation de l'environnement back-end
+
+on:
+    push:
+      branches:
+        - main
+    pull_request:
+      branches:
+        - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Workflow exécuté suite à un push ou une pull request sur la branche main."
+
