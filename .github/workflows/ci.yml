@@ -4,13 +4,27 @@ on:
     push:
       branches:
         - main
+        - develop
     pull_request:
       branches:
         - main
+        - develop
 
 jobs:
-  build:
+  dev:
+    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Workflow exécuté suite à un push ou une pull request sur la branche main."
+      # Cette action clone le dépôt Git dans la machine virtuelle Ubuntu pour que les fichiers soient disponibles pour les étapes suivantes
+      - uses: actions/checkout@v4
+      - name: echo de test
+        run: echo "Workflow exécuté suite à un push ou une pull request sur la branche develop."
 
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      # Cette action clone le dépôt Git dans la machine virtuelle Ubuntu pour que les fichiers soient disponibles pour les étapes suivantes
+      - uses: actions/checkout@v4
+      - name: echo de test
+        run: echo "Workflow exécuté suite à un push ou une pull request sur la branche main."
