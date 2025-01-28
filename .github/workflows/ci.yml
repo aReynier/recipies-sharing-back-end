@@ -67,16 +67,16 @@ jobs:
             cd $TEMP_DIR
             
             # Set proper permissions for the temp directory
-            chmod 700 $TEMP_DIR
+            chmod 755 $TEMP_DIR
             
             # Copy necessary files from repository
             scp -r $GITHUB_WORKSPACE/* .
             
             # Set permissions for copied files
-            chmod -R 600 .
-            chmod 600 package.json pnpm-lock.yaml
-            chmod 600 src/*
-            chmod 700 src/
+            chmod -R 755 .
+            chmod 644 package.json pnpm-lock.yaml
+            chmod 644 src/*
+            chmod 755 src/
             
             # Build the image
             docker build -t app-backend .
