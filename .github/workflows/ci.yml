@@ -23,15 +23,16 @@ jobs:
         run: |
           docker build . -t aurorereynier/recipies-sharing-back:v1.0
 
-      - name: push de l'image odcker du VPS
+      - name: push de l'image docker du VPS
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
-          docker save my-app-dev | ssh -i ~/.ssh/id_rsa -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "docker load"
+        run: echo "$SSH_PRIVATE_KEY"
+        # run: |
+        #   mkdir -p ~/.ssh
+        #   echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        #   chmod 600 ~/.ssh/id_rsa
+        #   ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+        #   docker save my-app-dev | ssh -i ~/.ssh/id_rsa -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "docker load"
 
 
   deploy:
