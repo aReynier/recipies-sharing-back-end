@@ -35,7 +35,10 @@ jobs:
       # keyscan ajoute la clé SSH du serveur distant dans le fichier known host
       - name: Installation de la clé SSH
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
         run: |
             set -e
             set -x 
@@ -43,8 +46,10 @@ jobs:
             install -m 600 -D /dev/null ~/.ssh/id_rsa
             echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
-            ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
-      
+            ssh-keyscan -H $VPS_PORT >> ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts 
+            ssh -i ~/.ssh/id_rsa -p $VPS_PORT $VPS_USERNAME@$VPS_HOST "echo 'Connection réussie!'"
+
       - name: Connection et récupération de l'image Docker
         run: |
             docker save aurorereynier/recipies-sharing-back:v1.0 | ssh -i ~/.ssh/id_rsa -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "docker load"
