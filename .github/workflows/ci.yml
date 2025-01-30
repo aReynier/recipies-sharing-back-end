@@ -28,11 +28,12 @@ jobs:
       - name: Installation de la clé SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: echo "$SSH_PRIVATE_KEY"
-          if [ ! -f ~/.ssh/id_rsa ]; then
-            install -m 600 -D /dev/null ~/.ssh/id_rsa
-          fi
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        run: |
+            echo "$SSH_PRIVATE_KEY"
+            if [ ! -f ~/.ssh/id_rsa ]; then
+              install -m 600 -D /dev/null ~/.ssh/id_rsa
+            fi
+            echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         # run: |
         #   mkdir -p ~/.ssh
         #   echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
