@@ -28,7 +28,8 @@ jobs:
       
       - name: Push de l'image Docker
         run: docker push aurorereynier/recipies-sharing-back:v1.0
-      # run if> ajoute le fichier id_rsa si il n'existe pas
+      # supprimer l'anicenne clé si elle existe
+      # install> ajoute le fichier id_rsa si il n'existe pas
       # echo > écrit le contenu de la clé privée dans le fichier id_rsa
       # chmod 600 sert à privatiser le clé
       # keyscan ajoute la clé SSH du serveur distant dans le fichier known host
@@ -36,9 +37,8 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-            if [ ! -f ~/.ssh/id_rsa ]; then
-              install -m 600 -D /dev/null ~/.ssh/id_rsa
-            fi
+            rm -f ~/.ssh/id_rsa
+            install -m 600 -D /dev/null ~/.ssh/id_rsa
             echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
             ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
