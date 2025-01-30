@@ -19,28 +19,29 @@ jobs:
       - uses: actions/checkout@v4
       - name: echo de test
         run: echo "Workflow exécuté suite à un push ou une pull request sur la branche develop."
-      - name: Contruction de l'image docker
+      - name: Contruction et publication de l'image docker
         run: |
           docker build . -t aurorereynier/recipies-sharing-back:v1.0
+          docker push aurorereynier/recipies-sharing-back:v1.0
 
       # run if> ajoute le fichier id_rsa si il n'existe pas
       # echo > écrit le contenu de la clé privée dans le fichier id_rsa
+      # chmod 600 sert à privatiser le clé
+      # keyscan ajoute la clé SSH du serveur distant dans le fichier known host
       - name: Installation de la clé SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-            echo "$SSH_PRIVATE_KEY"
             if [ ! -f ~/.ssh/id_rsa ]; then
               install -m 600 -D /dev/null ~/.ssh/id_rsa
             fi
             echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        # run: |
-        #   mkdir -p ~/.ssh
-        #   echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        #   chmod 600 ~/.ssh/id_rsa
-        #   ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
-        #   docker save my-app-dev | ssh -i ~/.ssh/id_rsa -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "docker load"
-
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Connection et récupération de l'image Docker
+        run: |
+            docker save aurorereynier/recipies-sharing-back:v1.0 | ssh -i ~/.ssh/id_rsa -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "docker load"
 
   deploy:
     if: github.ref == 'refs/heads/main'
