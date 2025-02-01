@@ -38,7 +38,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           debug: true
           script: |
-            echo "Test de connexion"
+            docker pull aurorereynier/recipies-sharing-back:v1.0
     
       # supprimer l'anicenne clé si elle existe
       # install> ajoute le fichier id_rsa si il n'existe pas
@@ -67,9 +67,9 @@ jobs:
       #       cat ~/.ssh/known_hosts
       #       ssh -i ~/.ssh/id_rsa -p $VPS_PORT $VPS_USERNAME@$VPS_HOST "echo 'Connection réussie!'"
 
-      - name: Connection et récupération de l'image Docker
-        run: |
-            docker save aurorereynier/recipies-sharing-back:v1.0 | ssh -i ~/.ssh/id_rsa -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "docker load"
+      # - name: Connection et récupération de l'image Docker
+      #   run: |
+      #       docker save aurorereynier/recipies-sharing-back:v1.0 | ssh -i ~/.ssh/id_rsa -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "docker load"
 
   deploy:
     if: github.ref == 'refs/heads/main'
