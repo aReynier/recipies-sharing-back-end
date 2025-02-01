@@ -36,6 +36,8 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           port: ${{ secrets.VPS_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ""  # même si pas de passphrase
+          command_timeout: "20m"
           debug: true
           script: |
             docker pull aurorereynier/recipies-sharing-back:v1.0
