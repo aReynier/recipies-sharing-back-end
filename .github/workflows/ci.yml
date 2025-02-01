@@ -29,13 +29,14 @@ jobs:
       - name: Push de l'image Docker
         run: docker push aurorereynier/recipies-sharing-back:v1.0
       
-      - name: Deploy via SSH
+      - name: Déployer via SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           port: ${{ secrets.VPS_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          debug: true
           script: |
             echo "Test de connexion"
     
