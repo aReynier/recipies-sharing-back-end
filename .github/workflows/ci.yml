@@ -51,8 +51,8 @@ jobs:
             ls -la ~/.ssh/
             ssh-keyscan -p $VPS_PORT -H $VPS_HOST >> ~/.ssh/known_hosts
             chmod 644 ~/.ssh/known_hosts 
-            # cat ~/.ssh/known_hosts
-            # ssh -i ~/.ssh/id_rsa -p $VPS_PORT $VPS_USERNAME@$VPS_HOST "echo 'Connection réussie!'"
+            cat ~/.ssh/known_hosts
+            ssh -i ~/.ssh/id_rsa -p $VPS_PORT $VPS_USERNAME@$VPS_HOST "echo 'Connection réussie!'"
 
       - name: Connection et récupération de l'image Docker
         run: |
