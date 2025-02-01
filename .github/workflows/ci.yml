@@ -28,31 +28,43 @@ jobs:
       
       - name: Push de l'image Docker
         run: docker push aurorereynier/recipies-sharing-back:v1.0
+      
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          port: ${{ secrets.VPS_PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "Test de connexion"
+    
       # supprimer l'anicenne clé si elle existe
       # install> ajoute le fichier id_rsa si il n'existe pas
       # echo > écrit le contenu de la clé privée dans le fichier id_rsa
       # chmod 600 sert à privatiser le clé
       # keyscan ajoute la clé SSH du serveur distant dans le fichier known host
-      - name: Installation de la clé SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          VPS_PORT: ${{ secrets.VPS_PORT }}
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
-        run: |
-            set -e  # Stoppe le script en cas d'erreur
-            set -x  # Affiche chaque commande exécutée (debug)
-            rm -f ~/.ssh/id_rsa
-            install -m 600 -D /dev/null ~/.ssh/id_rsa
-            echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
-            echo "VPS_HOST: $VPS_HOST"
-            echo "VPS_PORT: $VPS_PORT"
-            ls -la ~/.ssh/
-            ssh-keyscan -p $VPS_PORT -H $VPS_HOST >> ~/.ssh/known_hosts
-            chmod 644 ~/.ssh/known_hosts 
-            cat ~/.ssh/known_hosts
-            ssh -i ~/.ssh/id_rsa -p $VPS_PORT $VPS_USERNAME@$VPS_HOST "echo 'Connection réussie!'"
+      # - name: Installation de la clé SSH
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     VPS_PORT: ${{ secrets.VPS_PORT }}
+      #     VPS_HOST: ${{ secrets.VPS_HOST }}
+      #     VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+      #   run: |
+      #       set -e  # Stoppe le script en cas d'erreur
+      #       set -x  # Affiche chaque commande exécutée (debug)
+      #       rm -f ~/.ssh/id_rsa
+      #       install -m 600 -D /dev/null ~/.ssh/id_rsa
+      #       echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+      #       chmod 600 ~/.ssh/id_rsa
+      #       echo "VPS_HOST: $VPS_HOST"
+      #       echo "VPS_PORT: $VPS_PORT"
+      #       ls -la ~/.ssh/
+      #       ssh-keyscan -p $VPS_PORT -H $VPS_HOST >> ~/.ssh/known_hosts
+      #       chmod 644 ~/.ssh/known_hosts 
+      #       cat ~/.ssh/id_rsa
+      #       cat ~/.ssh/known_hosts
+      #       ssh -i ~/.ssh/id_rsa -p $VPS_PORT $VPS_USERNAME@$VPS_HOST "echo 'Connection réussie!'"
 
       - name: Connection et récupération de l'image Docker
         run: |
