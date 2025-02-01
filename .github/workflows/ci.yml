@@ -91,10 +91,18 @@ jobs:
            
             ssh -vvv -i ~/.ssh/id_rsa -p $VPS_PORT $VPS_USERNAME@$VPS_HOST "echo 'Test de connexion'"
 
-      - name: Connection et récupération de l'image Docker
-        run: |
-            docker save aurorereynier/recipies-sharing-back:v1.0 | ssh -i ~/.ssh/id_rsa -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "docker load"
-
+            - name: Déployer le conteneur sur le VPS
+            run: |
+              ssh -i ~/.ssh/id_rsa -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "\
+                docker pull aurorereynier/recipies-sharing-back:v1.0 && \
+                docker stop recipies-back || true && \
+                docker rm recipies-back || true && \
+                docker run -d \
+                  --name recipies-back \
+                  --restart unless-stopped \
+                  -p 3000:3000 \
+                  aurorereynier/recipies-sharing-back:v1.0"
+                  
   deploy:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
