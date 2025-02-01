@@ -75,29 +75,18 @@ jobs:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
         run: |
-            set -e  # Stoppe le script en cas d'erreur
-            set -x  # Affiche chaque commande exécutée (debug)
+            set -e
+            set -x
             rm -f ~/.ssh/id_rsa
             install -m 600 -D /dev/null ~/.ssh/id_rsa
             echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
             
-            # Afficher le début de la clé pour vérification (sans exposer toute la clé)
-            echo "Début de la clé SSH :"
-            head -n 1 ~/.ssh/id_rsa
-            
-            # Configuration SSH avec debug
             mkdir -p ~/.ssh
-            echo "Host $VPS_HOST
-              HostName $VPS_HOST
-              User $VPS_USERNAME
-              Port $VPS_PORT
-              IdentityFile ~/.ssh/id_rsa
-              LogLevel DEBUG3" > ~/.ssh/config
-            chmod 600 ~/.ssh/config
+            ssh-keyscan -p $VPS_PORT -H $VPS_HOST >> ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts
             
-            # Test de connexion avec verbose
-            ssh -vvv -i ~/.ssh/id_rsa -p $VPS_PORT $VPS_USERNAME@$VPS_HOST "echo 'Connection réussie!'"
+            ssh -vvv -i ~/.ssh/id_rsa -p $VPS_PORT $VPS_USERNAME@$VPS_HOST "echo 'Test de connexion'"
 
       - name: Connection et récupération de l'image Docker
         run: |
